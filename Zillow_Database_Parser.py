@@ -46,3 +46,9 @@ class Zillow_Database_Parser():
                     'Picture': image.find('picture', {'source': 'srcset'})
                 })
 
+    def convert(self):
+        with open('zillow.csv', 'w') as csv_file:
+            type = csv.DictWriter(csv_file, fieldnames=self.ret[0].keys())
+            type.writeheader()
+            for row in self.ret:
+                type.writerow(row)
