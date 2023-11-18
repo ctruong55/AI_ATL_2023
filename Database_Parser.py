@@ -28,7 +28,7 @@ class Database_Parser():
 
     def parse(self, responce):
         houseData = BeautifulSoup(responce, 'lxml')
-        imageList = content.find('ul', {'class': 'List-c11n-8-84-3_sc-1smrmqp-0 StyledSearchListWrapper-srp_sc-1ieen0c-0 doa-doM figiidE photo-cards photo-cards_extra-attribution'})
+        imageList = houseData.find('ul', {'class': 'List-c11n-8-84-3_sc-1smrmqp-0 StyledSearchListWrapper-srp_sc-1ieen0c-0 doa-doM figiidE photo-cards photo-cards_extra-attribution'})
         for image in imageList.contents:
             hold = image.find('script', {'type', 'application/ld+json'})
             if hold:
