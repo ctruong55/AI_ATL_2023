@@ -46,19 +46,32 @@ class Database_Parser():
     def parse(self, response):
         # houseData = BeautifulSoup(response, 'lxml')
         #print(response.text[:-100000])
-        index = response.text.find("{\"zpid\"")
-        index2 = response.text[index:].find("\"rooms")
-        holdJSON = json.loads(response.text[index:index + index2 + 11])
+        try:
+            holdJSON = json.loads(response)
+        except Exception:
+            return None
         print(holdJSON)
-        self.ret.append({
+        if holdJSON.keys() != 'carouselPhoto':
+            self.ret.append({
                         'Price': holdJSON['price'],
                         'Address': holdJSON['addressStreet'],
                         'City': holdJSON['addressCity'],
                         'State': holdJSON['addressState'],
                         'Postal': holdJSON['addressZipcode'],
                         'Floor Size': holdJSON['area'],
-                        'Longitude': holdJSON['latLong']['longitude'],
-                        'Latitude': holdJSON['latLong']['latitude'],
+                        'Longitude': holdJSON['hdpData']['homeInfo']['latitude'],
+                        'Latitude': holdJSON['hdpData']['homeInfo']['longitude'],
+                        'URL': holdJSON['detailUrl']
+            })
+        else: self.ret.append({
+                        'Price': holdJSON['price'],
+                        'Address': holdJSON['addressStreet'],
+                        'City': holdJSON['addressCity'],
+                        'State': holdJSON['addressState'],
+                        'Postal': holdJSON['addressZipcode'],
+                        'Floor Size': holdJSON['area'],
+                        'Longitude': holdJSON['hdpData']['homeInfo']['latitude'],
+                        'Latitude': holdJSON['hdpData']['homeInfo']['longitude'],
                         'URL': holdJSON['detailUrl'],
                         'Picture': holdJSON['carouselPhotos']
                     })
@@ -86,27 +99,31 @@ class Database_Parser():
         #     print("No data found for the specified class.")
 
     def convert(self):
-        if self.ret:
-            with open('Open_Housing_ForSale.csv', 'w', newline='') as csv_file:
-                writer = csv.DictWriter(csv_file, fieldnames=self.ret[0].keys())
-                writer.writeheader()
-                for row in self.ret:
-                    writer.writerow(row)
-        else:
-            print("No data to write to CSV.")
+        with open('Open_Housing_ForSale.csv', 'w', newline='') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=self.ret[0].keys())
+            writer.writeheader()
+            for row in self.ret:
+                writer.writerow(row)
 
 
     def start(self):
         url = 'https://www.zillow.com/homes/for_sale/'
 
-        for page in range(1, 13):
+        for page in range(1, 5):
             params = {
-                'searchQueryState': '{"pagination":{currentPage": %s},"isMapVisible":true,"mapBounds":{"west":-84.70817269775392,"east":-84.18014230224611,"south":33.55525685737029,"north":33.99360018262278},"filterState":{"sort":{"value":"globalrelevanceex"},"ah":{"value":true}},"isListVisible":true,"mapZoom":11}' %page
+                'searchQueryState': '{"pagination":{%s},"isMapVisible":true,"mapBounds":{"west":-84.70817269775392,"east":-84.18014230224611,"south":33.55525685737029,"north":33.99360018262278},"filterState":{"sort":{"value":"globalrelevanceex"},"ah":{"value":true}},"isListVisible":true,"mapZoom":11}' %page
             }
             res = self.get(url, params)
-            # print(res.content)
-            self.parse(res)
-            time.sleep(2)
+            out = ""
+            index = res.text.find("{\"zpid\"")
+            r = res.text
+            while index != -1:
+                index = r.find("{\"zpid\"")
+                index2 = r[index:].find("\"rooms")
+                out = r[index:index + index2]
+                print(out)
+                self.parse(out)
+                r = r[index2:]
         self.convert()
 
 if __name__ == '__main__':
