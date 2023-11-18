@@ -5,7 +5,7 @@ import time
 import csv
 
 
-class Zillow_Database_Parser():
+class Database_Parser():
     ret = []
     headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
@@ -42,13 +42,29 @@ class Zillow_Database_Parser():
                     'Floor Size': holdJSON['floorSize']['value'],
                     'Longitude': holdJSON['geo']['longitude'],
                     'Latitude': holdJSON['geo']['latitude'],
-                    'URL': holdJSON['url']
+                    'URL': holdJSON['url'],
                     'Picture': image.find('picture', {'source': 'srcset'})
                 })
 
     def convert(self):
-        with open('zillow.csv', 'w') as csv_file:
+        with open('Open_Housing_ForSale.csv', 'w') as csv_file:
             type = csv.DictWriter(csv_file, fieldnames=self.ret[0].keys())
             type.writeheader()
             for row in self.ret:
                 type.writerow(row)
+
+    def start(self):
+        page = 'https://www.zillow.com/homes/for_sale/'
+
+        for index in range(1, 3):
+            params = {
+                'searchQueryState': '{"pagination":{"currentPage": %s},"mapBounds":{"west":-74.40093013281245,"east":-73.55498286718745,"south":40.4487909557045,"north":40.96202658306895},"regionSelection":[{"regionId":6181,"regionType":6}],"isMapVisible":false,"filterState":{"isForSaleByAgent":{"value":false},"isNewConstruction":{"value":false},"isForSaleForeclosure":{"value":false},"isComingSoon":{"value":false},"isAuction":{"value":false}},"isListVisible":true}' %page
+            }
+            result = self.get(page, params)
+            self.parse(result.text)
+            time.sleep(2)
+        self.convert()
+
+if __name__ == '__main__':
+    web_parser = Database_Parser()
+    web_parser.start()
