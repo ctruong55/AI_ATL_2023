@@ -41,34 +41,41 @@ class Database_Parser():
         print(give.status_code)
         return give
 
-    def parse(self, responce):
-        houseData = BeautifulSoup(responce, 'lxml')
+    def parse(self, response):
+        houseData = BeautifulSoup(response, 'lxml')
         imageList = houseData.find('ul', {'class': 'List-c11n-8-84-3__sc-1smrmqp-0 StyledSearchListWrapper-srp__sc-1ieen0c-0 doa-doM fgiidE photo-cards'})
-        for image in imageList.contents:
-            hold = image.find('script', {'type', 'application/ld+json'})
-            if hold:
-                print(hold.petrify())
-                holdJSON = json.loads(hold.contents[0])
-                print(holdJSON)
-                # self.ret.append({
-                #     'Price': hold.find('div', {'class': 'list-card-price'}).text,
-                #     'Address': holdJSON['address']['streetAddress'],
-                #     'City': holdJSON['address']['addressLocality'],
-                #     'State': holdJSON['address']['addressRegion'],
-                #     'Postal': holdJSON['address']['postalCode'],
-                #     'Floor Size': holdJSON['floorSize']['value'],
-                #     'Longitude': holdJSON['geo']['longitude'],
-                #     'Latitude': holdJSON['geo']['latitude'],
-                #     'URL': holdJSON['url'],
-                #     'Picture': image.find('picture', {'source': 'srcset'})
-                # })
+        # Check if imageList is not None
+        if imageList:
+            for image in imageList.contents:
+                hold = image.find('script', {'type', 'application/ld+json'})
+                if hold:
+                    print(hold.prettify())
+                    holdJSON = json.loads(hold.contents[0])
+                    print(holdJSON)
+                    #     self.ret.append({
+                    #     'Price': hold.find('div', {'class': 'list-card-price'}).text,
+                    #     'Address': holdJSON['address']['streetAddress'],
+                    #     'City': holdJSON['address']['addressLocality'],
+                    #     'State': holdJSON['address']['addressRegion'],
+                    #     'Postal': holdJSON['address']['postalCode'],
+                    #     'Floor Size': holdJSON['floorSize']['value'],
+                    #     'Longitude': holdJSON['geo']['longitude'],
+                    #     'Latitude': holdJSON['geo']['latitude'],
+                    #     'URL': holdJSON['url'],
+                    #     'Picture': image.find('picture', {'source': 'srcset'})
+                    # })
+        else:
+            print("No data found for the specified class.")
 
     def convert(self):
-        with open('Open_Housing_ForSale.csv', 'w') as csv_file:
-            type = csv.DictWriter(csv_file, fieldnames=self.ret[0].keys())
-            type.writeheader()
-            for row in self.ret:
-                type.writerow(row)
+        if self.ret:
+            with open('Open_Housing_ForSale.csv', 'w', newline='') as csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=self.ret[0].keys())
+                writer.writeheader()
+                for row in self.ret:
+                    writer.writerow(row)
+        else:
+            print("No data to write to CSV.")
 
     def start(self):
         url = 'https://www.zillow.com/homes/for_sale/atlanta-ga/'
