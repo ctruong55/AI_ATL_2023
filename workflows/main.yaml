@@ -1,0 +1,19 @@
+name: Python Application Workflow
+
+on: [push]
+
+jobs:
+  example_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+      - name: Run Python script
+        run: python dalle(1).py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+	  GITKEY: ${{ secrets.GITKEY }}
