@@ -18,5 +18,5 @@ jobs:
       - name: Run Python script
         run: python dalle.py
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GITKEY: ${{ secrets.GITKEY }}
+          OPENAI_API_KEY: ${{ variables.OPENAI_API_KEY }}
+          GITKEY: ${{ variables.GITKEY }}
