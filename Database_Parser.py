@@ -39,8 +39,8 @@ class Database_Parser():
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
     }
 
-    def get(self, url, params):
-        give = requests.get(url, headers=self.headers, params=params)
+    def get(self, url):
+        give = requests.get(url, headers=self.headers)
         return give
 
     def parse(self, response):
@@ -51,7 +51,10 @@ class Database_Parser():
         except Exception:
             return None
         print(holdJSON)
-        if holdJSON.keys() != 'carouselPhoto':
+        for item in self.ret:
+            if len(self.ret) != 0 and holdJSON['addressStreet'] == self.ret[0]['Address']:
+                return None
+        if 'carouselPhotos' not in holdJSON.keys():
             self.ret.append({
                         'Price': holdJSON['price'],
                         'Address': holdJSON['addressStreet'],
@@ -62,6 +65,18 @@ class Database_Parser():
                         'Longitude': holdJSON['hdpData']['homeInfo']['latitude'],
                         'Latitude': holdJSON['hdpData']['homeInfo']['longitude'],
                         'URL': holdJSON['detailUrl']
+            })
+        elif 'area' not in holdJSON.keys():
+            self.ret.append({
+                        'Price': holdJSON['price'],
+                        'Address': holdJSON['addressStreet'],
+                        'City': holdJSON['addressCity'],
+                        'State': holdJSON['addressState'],
+                        'Postal': holdJSON['addressZipcode'],
+                        'Longitude': holdJSON['hdpData']['homeInfo']['latitude'],
+                        'Latitude': holdJSON['hdpData']['homeInfo']['longitude'],
+                        'URL': holdJSON['detailUrl'],
+                        'Picture': holdJSON['carouselPhotos']
             })
         else: self.ret.append({
                         'Price': holdJSON['price'],
@@ -74,7 +89,7 @@ class Database_Parser():
                         'Latitude': holdJSON['hdpData']['homeInfo']['longitude'],
                         'URL': holdJSON['detailUrl'],
                         'Picture': holdJSON['carouselPhotos']
-                    })
+            })
 
         # imageList = holdJSON.find('ul', {'class': 'List-c11n-8-84-3__sc-1smrmqp-0 StyledSearchListWrapper-srp__sc-1ieen0c-0 doa-doM fgiidE photo-cards'})
         # if imageList:
@@ -99,31 +114,38 @@ class Database_Parser():
         #     print("No data found for the specified class.")
 
     def convert(self):
-        with open('Open_Housing_ForSale.csv', 'w', newline='') as csv_file:
-            writer = csv.DictWriter(csv_file, fieldnames=self.ret[0].keys())
-            writer.writeheader()
-            for row in self.ret:
-                writer.writerow(row)
-
+        if self.ret:
+            with open('Open_Housing_ForSale.csv', 'w', newline='') as csv_file:
+                writer = csv.DictWriter(csv_file, fieldnames=self.ret[0].keys())
+                writer.writeheader()
+                for row in self.ret:
+                    writer.writerow(row)
+        else:
+            print('No Data to Write to CSV')
 
     def start(self):
         url = 'https://www.zillow.com/homes/for_sale/'
 
-        for page in range(1, 5):
-            params = {
-                'searchQueryState': '{"pagination":{%s},"isMapVisible":true,"mapBounds":{"west":-84.70817269775392,"east":-84.18014230224611,"south":33.55525685737029,"north":33.99360018262278},"filterState":{"sort":{"value":"globalrelevanceex"},"ah":{"value":true}},"isListVisible":true,"mapZoom":11}' %page
-            }
-            res = self.get(url, params)
+        for page in range(1, 20):
+            # params = {
+            #     'searchQueryState': '{"pagination":{%s},"isMapVisible":true,"mapBounds":{"west":-84.70817269775392,"east":-84.18014230224611,"south":33.55525685737029,"north":33.99360018262278},"filterState":{"sort":{"value":"globalrelevanceex"},"ah":{"value":true},"isListVisible":true,"mapZoom":11}' %page
+
+            # }
+            url+='%s_p/' %page
+            res = self.get(url)
             out = ""
             index = res.text.find("{\"zpid\"")
             r = res.text
             while index != -1:
                 index = r.find("{\"zpid\"")
                 index2 = r[index:].find("\"rooms")
-                out = r[index:index + index2]
+                out = r[index:index + index2 + 11]
                 print(out)
                 self.parse(out)
                 r = r[index2:]
+            print(url)
+            url = 'https://www.zillow.com/homes/for_sale/'
+            time.sleep(2)
         self.convert()
 
 if __name__ == '__main__':
