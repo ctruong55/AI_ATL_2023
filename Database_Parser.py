@@ -115,7 +115,7 @@ class Database_Parser():
 
     def convert(self):
         if self.ret:
-            with open('Open_Housing_ForSale.csv', 'w', newline='') as csv_file:
+            with open('Open_Housing_ForSale_numb#2.csv', 'w', newline='') as csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=self.ret[0].keys())
                 writer.writeheader()
                 for row in self.ret:
@@ -126,7 +126,7 @@ class Database_Parser():
     def start(self):
         url = 'https://www.zillow.com/homes/for_sale/'
 
-        for page in range(1, 20):
+        for page in range(14, 21):
             # params = {
             #     'searchQueryState': '{"pagination":{%s},"isMapVisible":true,"mapBounds":{"west":-84.70817269775392,"east":-84.18014230224611,"south":33.55525685737029,"north":33.99360018262278},"filterState":{"sort":{"value":"globalrelevanceex"},"ah":{"value":true},"isListVisible":true,"mapZoom":11}' %page
 
