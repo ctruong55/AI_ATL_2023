@@ -1,0 +1,17 @@
+{
+ "exportContext":
+   {
+      "fileType": "CSV",
+      "uri": "gs://bucket_name/path_to_csv_file",
+      "databases": [""],
+      "offload": true,
+      "csvExportOptions":
+       {
+           "selectQuery": "SELECT_QUERY",
+           "escapeCharacter":  "5C",
+           "quoteCharacter": "22",
+           "fieldsTerminatedBy": "2C",
+           "linesTerminatedBy": "0A"
+       }
+   }
+}
