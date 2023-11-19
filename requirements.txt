@@ -1,0 +1,8 @@
+ssl
+openai 
+urllib
+certifi
+github
+requests
+os
+flask
