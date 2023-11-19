@@ -1,9 +1,5 @@
-ssl
 openai
-urllib
 certifi
-github
+PyGithub
 requests
-os
 flask
-
