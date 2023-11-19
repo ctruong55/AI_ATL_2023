@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading</title>
+    <style>
+        /* Add your loading screen styles here */
+        .loading-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: rgba(0, 0, 0); /* Semi-transparent background */
+        }
+
+        .loader {
+            border: 8px solid #ffffff; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue color */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen">
+        <div class="loader"></div>
+    </div>
+
+    <script>
+        // Set the time you want to show the loading screen (in milliseconds)
+        var loadingTime = 5000; // For example, 5000 milliseconds (5 seconds)
+
+        setTimeout(function() {
+            window.location.href = 'results.html'; // Redirect to results.html after the loading time
+        }, loadingTime);
+    </script>
+</body>
+</html>
