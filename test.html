@@ -3,12 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <title>Display Image</title>
+    <style>
+        /* Set the background color of the entire page */
+        body {
+            background-color: #f0f0f0; /* Replace with your desired color */
+            margin: 0; /* Removes the default margin */
+            font-family: inherit; /* Optional: sets a default font */
+        }
+
+        /* Center content */
+        .center-content {
+            text-align: center; /* Center the content horizontally */
+            margin-top: 20px; /* Adds some space at the top */
+        }
+
+        /* Style for the image container */
+        .image-container {
+            text-align: center; /* Center the image */
+        }
+        /* Style for the textarea */
+        textarea {
+            width: 80%; /* Width of the textarea */
+            height: 100px; /* Height of the textarea */
+            margin-top: 10px; /* Space above the textarea */
+        }
+
+        /* Style for the button */
+        button {
+            margin-top: 10px; /* Space above the button */
+            padding: 10px 20px; /* Padding inside the button */
+            font-size: 16px; /* Font size of button text */
+        }
+    </style>
 </head>
 <body>
-    <h1>Uploaded Image</h1>
-    <input type="text" id="imagePrompt" placeholder="Enter image prompt">
-    <button id="uploadButton">Upload Image</button>
-    <img id="uploadedImage" src="" alt="Uploaded Image will appear here">
+    <div class="center-content">
+        <h1>Find your ideal home today!</h1>
+        <textarea id="imagePrompt" placeholder="My dream Home is..."></textarea><br>
+        <button id="uploadButton">Generate</button>
+    </div>
+    <div class="image-container">
+        <img id="uploadedImage" src="" alt="">
+    </div>
     <script>
         document.getElementById('uploadButton').addEventListener('click', function() {
         var imagePrompt = document.getElementById('imagePrompt').value;
@@ -17,6 +53,8 @@
             alert("Please enter an image prompt.");
             return;
         }
+        uploadButton.textContent = 'Generating...';
+        uploadButton.disabled = true;
 
         const dataToSend = { prompt: imagePrompt };
 
@@ -30,6 +68,8 @@
         .then(response => response.json())
         .then(data => {
             document.getElementById('uploadedImage').src = data.result;
+            uploadButton.textContent = 'Generate';
+            uploadButton.disabled = false;
         })
         .catch(error => console.error('Error:', error))});
     </script>
