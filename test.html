@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Display Image</title>
+</head>
+<body>
+    <h1>Uploaded Image</h1>
+    <input type="text" id="imagePrompt" placeholder="Enter image prompt">
+    <button id="uploadButton">Upload Image</button>
+    <img id="uploadedImage" src="" alt="Uploaded Image will appear here">
+    <script>
+        document.getElementById('uploadButton').addEventListener('click', function() {
+        var imagePrompt = document.getElementById('imagePrompt').value;
+
+        if (!imagePrompt) {
+            alert("Please enter an image prompt.");
+            return;
+        }
+
+        const dataToSend = { prompt: imagePrompt };
+
+        fetch('http://127.0.0.1:8080/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataToSend)
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('uploadedImage').src = data.result;
+        })
+        .catch(error => console.error('Error:', error))});
+    </script>
+</body>
+</html>
